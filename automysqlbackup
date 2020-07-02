@@ -150,6 +150,12 @@ mail_cleanup () {
   if [[ ! -e "$log_file" && ! -e "$log_errfile" ]];then
     echo "Skipping normal output methods, since the program exited before any log files could be created."
   else
+    # Remove annoying warning message since MySQL 5.6
+    if [[ -s "$log_errfile" ]]; then
+    	sedtmpfile="/tmp/$(basename $0).$$.tmp"
+    	grep -v "password on the command line interface can be insecure." "$log_errfile" > $sedtmpfile
+    	mv $sedtmpfile $log_errfile
+    fi
     case "${CONFIG_mailcontent}" in
 	    'files')
 			    # Include error log if larger than zero.
